@@ -1,0 +1,117 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1",
+        "update_url": null
+    },
+    "exported_at": "2021-09-19T13:17:52+02:00",
+    "name": "Eggs Spigot",
+    "author": "sulivandu72@gmail.com",
+    "description": "Eggs Pterodactyl - Spigot - French - Fonctionnel",
+    "features": [
+        "eula"
+    ],
+    "images": [
+        "quay.io\/parkervcp\/pterodactyl-images:debian_openjdk-16",
+        "quay.io\/pterodactyl\/core:java-11",
+        "quay.io\/pterodactyl\/core:java"
+    ],
+    "file_denylist": [],
+    "startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"enable-query\": \"true\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\",\r\n            \"max-players\": \"{{server.build.env.MAX_PLAYERS}}\",\r\n            \"motd\": \"{{server.build.env.SERVER_HOSTNAME}}\",\r\n            \"difficulty\": \"{{server.build.env.DIFFICULTY}}\",\r\n            \"op-permission-level\": \"{{server.build.env.OP}}\",\r\n            \"pvp\": \"{{server.build.env.PVP}}\",\r\n            \"online-mode\": \"{{server.build.env.ONLINE_MODE}}\",\r\n            \"white-list\": \"{{server.build.env.WHITE_LIST}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! Aide, type \",\r\n    \"userInteraction\": [\r\n        \"Allez dans eula.txt pour plus d'info.\"\r\n    ]\r\n}",
+        "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"logs\/latest.log\"\r\n}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# Spigot Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n\r\napt update \r\napt install -y curl wget git openssl bash bc apt-transport-https gnupg software-properties-common\r\nwget -qO - https:\/\/adoptopenjdk.jfrog.io\/adoptopenjdk\/api\/gpg\/key\/public | apt-key add -\r\nadd-apt-repository --yes https:\/\/adoptopenjdk.jfrog.io\/adoptopenjdk\/deb\/\r\napt update\r\nmkdir -p \/usr\/share\/man\/man1\r\nif [ \"${DL_VERSION}\" == \"latest\" ] || (( $(echo \"${DL_VERSION} >= 1.17\" | bc -l) )); then\r\n    apt install -y adoptopenjdk-16-hotspot\r\nelse\r\n    apt install -y adoptopenjdk-8-hotspot\r\nfi\r\n\r\n## Only download if a path is provided, otherwise continue.\r\nif [ ! -z \"${DL_PATH}\" ]; then\r\n    cd \/mnt\/server\r\n\r\n    MODIFIED_DOWNLOAD=`eval echo $(echo ${DL_PATH} | sed -e 's\/{{\/${\/g' -e 's\/}}\/}\/g')`\r\n    curl -sSL -o ${SERVER_JARFILE} ${MODIFIED_DOWNLOAD}\r\nelse\r\n    mkdir -p \/srv\/\r\n    cd \/srv\/\r\n    \r\n    wget https:\/\/hub.spigotmc.org\/jenkins\/job\/BuildTools\/lastSuccessfulBuild\/artifact\/target\/BuildTools.jar\r\n    \r\n    java -jar BuildTools.jar --rev ${DL_VERSION}\r\n\r\n    mv spigot-*.jar \/mnt\/server\/${SERVER_JARFILE}\r\nfi",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Fichier D\u00e9marrage",
+            "description": "Fichier de d\u00e9marrage",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "server.jar",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:\/^([\\w\\d._-]+)(\\.jar)$\/"
+        },
+        {
+            "name": "Spigot Version",
+            "description": "",
+            "env_variable": "DL_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|between:3,7"
+        },
+        {
+            "name": "Slots minecraft",
+            "description": "Choisir le nombre de joueurs qui peuvent join le serveur",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "100",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1,1024"
+        },
+        {
+            "name": "Choisir la description de votre serveur",
+            "description": "Affiche la description de votre serveur sur la page de login",
+            "env_variable": "SERVER_HOSTNAME",
+            "default_value": "Mon Serveur Minecraft",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Crack ou Premium",
+            "description": "True = premium\r\nFalse = crack",
+            "env_variable": "ONLINE_MODE",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20"
+        },
+        {
+            "name": "White List",
+            "description": "Activer la white list pour vos joueurs :\r\ntrue = activer\r\nfalse = desactiver",
+            "env_variable": "WHITE_LIST",
+            "default_value": "false",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:5"
+        },
+        {
+            "name": "Difficulte Minecraft",
+            "description": "Choisir la difficult\u00e9 de votre exp\u00e9rience de jeux",
+            "env_variable": "DIFFICULTY",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:1"
+        },
+        {
+            "name": "Op\u00e9rateur Permissions",
+            "description": "Permet d'attribuer des permissions ou non au membre \"op\"",
+            "env_variable": "OP",
+            "default_value": "4",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:1"
+        },
+        {
+            "name": "Le PvP",
+            "description": "True = PvP Activer\r\nFalse = PvP D\u00e9sactiver",
+            "env_variable": "PVP",
+            "default_value": "true",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:5"
+        }
+    ]
+}
