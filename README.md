@@ -1,2 +1,5 @@
-# eggs-pterodactyl
-Creation of pterodactyl eggs taken from parker's github and edited by me, to improve them in French !
+👋 Hi, I’m @SulivanW
+👀 I am interested in coding and internet networks
+🌱 I am currently learning the internet network (Tunnel)
+💞️ collaboration with Open-All French hosting with multiple offers
+📫 Reach me via e-mail: sulivan@open-all.fr
