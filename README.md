@@ -7,3 +7,5 @@
 💞️ collaboration with Open-All French hosting with multiple offers
 
 📫 Reach me via e-mail: sulivan@open-all.fr
+
+Eggs Pterodactyl on the 
