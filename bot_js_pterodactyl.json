@@ -1,0 +1,115 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1",
+        "update_url": null
+    },
+    "exported_at": "2021-09-19T11:44:24+02:00",
+    "name": "Eggs DiscordJS",
+    "author": "sulivan@open-all.fr",
+    "description": "Eggs Pterodactyl Français fonctionnel en cas de soucis me contacter sur discord : Sulivan .W#0001",
+    "features": null,
+    "images": [
+        "ghcr.io\/parkervcp\/yolks:nodejs_16",
+        "ghcr.io\/parkervcp\/yolks:nodejs_15",
+        "ghcr.io\/parkervcp\/yolks:nodejs_14",
+        "ghcr.io\/parkervcp\/yolks:nodejs_12"
+    ],
+    "file_denylist": [],
+    "startup": "if [[ -d .git ]] && [[ {{UPDATE}} == \"1\" ]]; then git pull; fi; if [[ ! -z ${ADD_MODULE} ]]; then \/usr\/local\/bin\/npm install ${ADD_MODULE}; fi; if [[ ! -z ${SUPP_MODULE} ]]; then \/usr\/local\/bin\/npm uninstall ${SUPP_MODULE}; fi; if [ -f \/home\/container\/package.json ]; then \/usr\/local\/bin\/npm install; fi; \/usr\/local\/bin\/node \/home\/container\/{{ON_BOT}}",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"change this part\"\r\n}",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# NodeJS Bot Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\napt update\r\napt install -y git curl jq file unzip make gcc g++ python python-dev libtool\r\n\r\nmkdir -p \/mnt\/server\r\ncd \/mnt\/server\r\n\r\nif [ \"${USER_GITHUB}\" == \"true\" ] || [ \"${USER_GITHUB}\" == \"1\" ]; then\r\n    echo -e \"assuming user knows what they are doing have a good day.\"\r\n    exit 0\r\nfi\r\n\r\n## add git ending if it's not on the address\r\nif [[ ${LIENS_GITHUB} != *.git ]]; then\r\n    LIENS_GITHUB=${LIENS_GITHUB}.git\r\nfi\r\n\r\nif [ -z \"${USERNAME}\" ] && [ -z \"${TOKEN_GITHUB}\" ]; then\r\n    echo -e \"using anon api call\"\r\nelse\r\n    LIENS_GITHUB=\"https:\/\/${USERNAME}:${TOKEN_GITHUB}@$(echo -e ${LIENS_GITHUB} | cut -d\/ -f3-)\"\r\nfi\r\n\r\n## pull git js bot repo\r\nif [ \"$(ls -A \/mnt\/server)\" ]; then\r\n    echo -e \"\/mnt\/server directory is not empty.\"\r\n    if [ -d .git ]; then\r\n        echo -e \".git directory exists\"\r\n        if [ -f .git\/config ]; then\r\n            echo -e \"loading info from git config\"\r\n            ORIGIN=$(git config --get remote.origin.url)\r\n        else\r\n            echo -e \"files found with no git config\"\r\n            echo -e \"closing out without touching things to not break anything\"\r\n            exit 10\r\n        fi\r\n    fi\r\n\r\n    if [ \"${ORIGIN}\" == \"${LIENS_GITHUB}\" ]; then\r\n        echo \"pulling latest from github\"\r\n        git pull\r\n    fi\r\nelse\r\n    echo -e \"\/mnt\/server is empty.\\ncloning files into repo\"\r\n    if [ -z ${LINKS} ]; then\r\n        echo -e \"cloning default branch\"\r\n        git clone ${LIENS_GITHUB} .\r\n    else\r\n        echo -e \"cloning ${LINKS}'\"\r\n        git clone --single-branch --branch ${LINKS} ${LIENS_GITHUB} .\r\n    fi\r\n\r\nfi\r\n\r\necho \"Installing nodejs packages\"\r\nif [[ ! -z ${ADD_MODULE} ]]; then\r\n    \/usr\/local\/bin\/npm install ${ADD_MODULE}\r\nfi\r\n\r\nif [ -f \/mnt\/server\/package.json ]; then\r\n    \/usr\/local\/bin\/npm install --production\r\nfi\r\n\r\necho -e \"install complete\"\r\nexit 0",
+            "container": "node:14-buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [{
+            "name": "GitHub URL",
+            "description": "Exemple : https:\/\/github.com\/sulivan\/repo_name",
+            "env_variable": "LIENS_GITHUB",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "Installer le liens",
+            "description": "Liens ou le bot peux venir télécharger le script bot.",
+            "env_variable": "LINKS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "Fichier User",
+            "description": "Ignorez tous les éléments d'installation si vous laissez un utilisateur télécharger des fichiers.\r\n\r\n0 = désactiver (default)\r\n1 = true",
+            "env_variable": "USER_GITHUB",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|bool"
+        },
+        {
+            "name": "Update Automatique",
+            "description": "En cas d'update sur votre github : les fichiers ce mettent à jour automatique au redémarrage.\r\n\r\n0 = désactiver \r\n1 = activé",
+            "env_variable": "UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean"
+        },
+        {
+            "name": "Démarrage script",
+            "description": "Le bot démarrera avec soit la valeur par default : (index.js)",
+            "env_variable": "ON_BOT",
+            "default_value": "index.js",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Ajoutez-un module à votre",
+            "description": "C'est comme si, vous utiliser \"npm install <package>\": .\r\n\r\nDans la cases utiliser simplement le nom du module !",
+            "env_variable": "ADD_MODULE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "GITHUB NAME",
+            "description": "Nom du compte pour ce login",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "Token accès au GitHub",
+            "description": "Tout voir ici : \r\nhttps:\/\/github.com\/settings\/tokens\r\nhttps:\/\/gitlab.com\/-\/profile\/personal_access_tokens",
+            "env_variable": "TOKEN_GITHUB",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "Supprimer un module",
+            "description": "Suppresion de module que votre bot posède",
+            "env_variable": "SUPP_MODULE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string"
+        }
+    ]
+}
